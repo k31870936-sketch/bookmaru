@@ -210,7 +210,7 @@ function BottomNav({ screen, setScreen }) {
 // Supabase 데이터 훅
 // ──────────────────────────────────────────────
 function useSupabase() {
-  const isConfigured = true;
+  const isConfigured = true; // Supabase 연결됨
 
   // ── 공지 ──
   const fetchNotices = async () => {
@@ -592,7 +592,9 @@ function FeedScreen({ setScreen, db }) {
 // 기록 업로드 (사진 포함)
 // ──────────────────────────────────────────────
 function UploadScreen({ setScreen, db, onPostAdded }) {
-  const [form, setForm] = useState({ author: "", grade: "", type: "독서", content: "" });
+  const savedName = localStorage.getItem("bm_author") || "";
+  const savedGrade = localStorage.getItem("bm_grade") || "";
+  const [form, setForm] = useState({ author: savedName, grade: savedGrade, type: "독서", content: "" });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -610,6 +612,9 @@ function UploadScreen({ setScreen, db, onPostAdded }) {
 
   const handleSubmit = async () => {
     if (!form.author.trim() || !form.content.trim()) return;
+    // 이름/학년 저장
+    localStorage.setItem("bm_author", form.author);
+    localStorage.setItem("bm_grade", form.grade);
     setUploading(true);
     let imageUrl = null;
     if (imageFile) imageUrl = await db.uploadPhoto(imageFile);
@@ -647,6 +652,7 @@ function UploadScreen({ setScreen, db, onPostAdded }) {
       {/* 이름 */}
       <Field label="이름 *">
         <input value={form.author} onChange={e => setForm(p => ({ ...p, author: e.target.value }))} placeholder="이름을 입력해주세요" style={inputStyle} />
+        {form.author && <p style={{ fontSize: 11, color: ORANGE, margin: "4px 0 0", fontFamily: "'Noto Sans KR', sans-serif" }}>✅ 다음에도 자동으로 채워져요</p>}
       </Field>
 
       {/* 학년 */}
