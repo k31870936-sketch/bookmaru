@@ -210,7 +210,7 @@ function BottomNav({ screen, setScreen }) {
 // Supabase 데이터 훅
 // ──────────────────────────────────────────────
 function useSupabase() {
-  const isConfigured = SUPABASE_URL !== "https://hpyopntcjsuobgbmnrhb.supabase.co";
+  const isConfigured = true;
 
   // ── 공지 ──
   const fetchNotices = async () => {
