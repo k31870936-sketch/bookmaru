@@ -1253,4 +1253,3 @@ export default function App() {
     </div>
   );
 }
-깃허브 코드에 날짜와 시간 추가 방법 - Manus
