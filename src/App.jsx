@@ -284,7 +284,12 @@ function useSupabase() {
     return data.publicUrl;
   };
 
-  return { fetchNotices, addNotice, fetchPosts, addPost, addComment, toggleLike, uploadPhoto, isConfigured };
+  const deletePost = async (postId) => {
+    if (!isConfigured) return true;
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+    return !error;
+  };
+  return { fetchNotices, addNotice, fetchPosts, addPost, deletePost, addComment, toggleLike, uploadPhoto, isConfigured };
 }
 
 // ──────────────────────────────────────────────
@@ -460,6 +465,16 @@ function FeedScreen({ setScreen, db }) {
     );
   };
 
+  const handleDelete = async (postId) => {
+    if (!window.confirm("정말 이 기록을 삭제하시겠습니까?")) return;
+    const success = await db.deletePost(postId);
+    if (success) {
+      setPosts(prev => prev.filter(p => p.id !== postId));
+      setToast("기록이 삭제되었습니다.");
+    } else {
+      setToast("삭제에 실패했습니다.");
+    }
+  };
   const handleComment = async (postId) => {
     const text = commentText[postId]?.trim();
     const author = commentAuthor[postId]?.trim() || "익명";
@@ -637,7 +652,10 @@ function FeedScreen({ setScreen, db }) {
                   </span>
                 </div>
                 <div style={{ fontSize: 12, color: GRAY, marginTop: 2, fontFamily: "'Noto Sans KR', sans-serif" }}>
-                  {fmtDate(post.created_at)}
+                  {fmtDate(post.created_at)} 
+                {isTeacher && (
+                  <button onClick={() => handleDelete(post.id)} style={{ background: "none", border: "none", color: "#EF4444", fontSize: 12, cursor: "pointer", padding: "4px 0", fontFamily: "'Noto Sans KR', sans-serif" }}>삭제</button>
+                )}
                 </div>
               </div>
             </div>
@@ -675,7 +693,7 @@ function FeedScreen({ setScreen, db }) {
                     borderTop: "1px solid #F3E8D4",
                   }}
                 >
-                  📅 {fmtDate(post.created_at)}
+                  📅 {fmtDate(post.created_at)} 
                 </div>
               </div>
             )}
@@ -1212,7 +1230,7 @@ export default function App() {
         {screen === "home" && <HomeScreen setScreen={setScreen} notices={notices} posts={posts} />}
         {screen === "notices" && <NoticesScreen setScreen={setScreen} notices={notices} setDetailNotice={setDetailNotice} />}
         {screen === "noticeDetail" && <NoticeDetailScreen notice={detailNotice} setScreen={setScreen} />}
-        {screen === "feed" && <FeedScreen setScreen={setScreen} db={db} />}
+        {screen === "feed" {screen === "feed" && <FeedScreen setScreen={setScreen} db={db} />}{screen === "feed" && <FeedScreen setScreen={setScreen} db={db} />} <FeedScreen setScreen={setScreen} db={db} isTeacher={isTeacher} />}
         {screen === "upload" && (
           <UploadScreen
             setScreen={setScreen} db={db}
