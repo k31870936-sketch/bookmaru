@@ -110,17 +110,20 @@ const TYPE_META = {
 };
 
 const fmtDate = (iso) => {
-  if (!iso) return "";
-
   const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 60000);
+  if (diff < 1) return "방금 전";
+  if (diff < 60) return `${diff}분 전`;
+  if (diff < 1440) return `${Math.floor(diff / 60)}시간 전`;
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+};
 
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(d);
+const avatarColor = (name) => {
+  const palette = ["#FB923C", "#34D399", "#60A5FA", "#F472B6", "#A78BFA", "#FBBF24"];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % palette.length;
+  return palette[h];
 };
 
 // ──────────────────────────────────────────────
