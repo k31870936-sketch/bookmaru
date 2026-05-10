@@ -434,7 +434,10 @@ function FeedScreen({ setScreen, db }) {
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    db.fetchPosts().then(data => { setPosts(data); setLoading(false); });
+    db.fetchPosts().then(data => {
+      setPosts(data);
+      setLoading(false);
+    });
   }, []);
 
   const filtered = filter === "전체" ? posts : posts.filter(p => p.type === filter);
@@ -442,23 +445,37 @@ function FeedScreen({ setScreen, db }) {
   const handleLike = async (postId) => {
     const post = posts.find(p => p.id === postId);
     const newLiked = await db.toggleLike(postId, post._liked);
-    setPosts(prev => prev.map(p => p.id === postId
-      ? { ...p, _liked: newLiked, _likes: p._likes + (newLiked ? 1 : -1) }
-      : p
-    ));
+
+    setPosts(prev =>
+      prev.map(p =>
+        p.id === postId
+          ? { ...p, _liked: newLiked, _likes: p._likes + (newLiked ? 1 : -1) }
+          : p
+      )
+    );
   };
 
   const handleComment = async (postId) => {
     const text = commentText[postId]?.trim();
     const author = commentAuthor[postId]?.trim() || "익명";
     if (!text) return;
+
     setSubmittingComment(prev => ({ ...prev, [postId]: true }));
+
     const newComment = await db.addComment(postId, author, text);
+
     if (newComment) {
-      setPosts(prev => prev.map(p => p.id === postId ? { ...p, _comments: [...p._comments, newComment] } : p));
+      setPosts(prev =>
+        prev.map(p =>
+          p.id === postId
+            ? { ...p, _comments: [...p._comments, newComment] }
+            : p
+        )
+      );
       setCommentText(prev => ({ ...prev, [postId]: "" }));
       setToast("댓글이 등록됐어요 💬");
     }
+
     setSubmittingComment(prev => ({ ...prev, [postId]: false }));
   };
 
@@ -467,192 +484,315 @@ function FeedScreen({ setScreen, db }) {
   return (
     <div style={{ padding: "20px 16px 24px" }}>
       {selectedImage && (
-  <div
-    onClick={() => setSelectedImage(null)}
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.85)",
-      zIndex: 9999,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 16,
-    }}
-  >
-    <img
-      src={selectedImage}
-      alt="확대 사진"
-      style={{
-        maxWidth: "100%",
-        maxHeight: "90vh",
-        objectFit: "contain",
-        borderRadius: 12,
-      }}
-    />
-  </div>
-)}
+        <div
+          onClick={() => setSelectedImage(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.85)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedImage(null);
+            }}
+            style={{
+              position: "absolute",
+              top: 20,
+              right: 20,
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              border: "none",
+              background: "rgba(255,255,255,0.95)",
+              color: "#111827",
+              fontSize: 24,
+              fontWeight: "700",
+              cursor: "pointer",
+              zIndex: 10000,
+              lineHeight: "40px",
+            }}
+          >
+            ×
+          </button>
+
+          <img
+            src={selectedImage}
+            alt="확대 사진"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "90vh",
+              objectFit: "contain",
+              borderRadius: 12,
+            }}
+          />
+        </div>
+      )}
+
       {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
+
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: "800", color: BROWN, margin: 0, fontFamily: "'Noto Sans KR', sans-serif" }}>🌱 성장기록</h1>
-        <button onClick={() => setScreen("upload")} style={{ background: ORANGE, color: "#fff", border: "none", borderRadius: 20, padding: "8px 14px", cursor: "pointer", fontSize: 13, fontWeight: "700", fontFamily: "'Noto Sans KR', sans-serif" }}>+ 기록하기</button>
+        <h1 style={{ fontSize: 20, fontWeight: "800", color: BROWN, margin: 0, fontFamily: "'Noto Sans KR', sans-serif" }}>
+          🌱 성장기록
+        </h1>
+        <button
+          onClick={() => setScreen("upload")}
+          style={{
+            background: ORANGE,
+            color: "#fff",
+            border: "none",
+            borderRadius: 20,
+            padding: "8px 14px",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: "700",
+            fontFamily: "'Noto Sans KR', sans-serif",
+          }}
+        >
+          + 기록하기
+        </button>
       </div>
 
-      {/* 필터 */}
       <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto", paddingBottom: 4 }}>
         {["전체", "독서", "운동", "일과", "습관"].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            padding: "7px 14px", borderRadius: 20, border: "none", cursor: "pointer",
-            background: filter === f ? ORANGE : "#F3E8D4",
-            color: filter === f ? "#fff" : BROWN,
-            fontSize: 13, fontWeight: filter === f ? "700" : "400",
-            whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'Noto Sans KR', sans-serif",
-          }}>{f}</button>
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            style={{
+              padding: "7px 14px",
+              borderRadius: 20,
+              border: "none",
+              cursor: "pointer",
+              background: filter === f ? ORANGE : "#F3E8D4",
+              color: filter === f ? "#fff" : BROWN,
+              fontSize: 13,
+              fontWeight: filter === f ? "700" : "400",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              fontFamily: "'Noto Sans KR', sans-serif",
+            }}
+          >
+            {f}
+          </button>
         ))}
       </div>
 
-      {filtered.length === 0 && <p style={{ color: GRAY, textAlign: "center", padding: "40px 0", fontFamily: "'Noto Sans KR', sans-serif" }}>아직 기록이 없어요. 첫 번째로 올려봐요! 🌱</p>}
+      {filtered.length === 0 && (
+        <p style={{ color: GRAY, textAlign: "center", padding: "40px 0", fontFamily: "'Noto Sans KR', sans-serif" }}>
+          아직 기록이 없어요. 첫 번째로 올려봐요! 🌱
+        </p>
+      )}
 
       {filtered.map(post => {
         const meta = TYPE_META[post.type] || {};
         const isExpanded = expanded[post.id];
+
         return (
-          <div key={post.id} style={{ background: CARD_BG, border: "1px solid #F3E8D4", borderRadius: 20, padding: "16px", marginBottom: 14 }}>
-            {/* 헤더 */}
+          <div
+            key={post.id}
+            style={{
+              background: CARD_BG,
+              border: "1px solid #F3E8D4",
+              borderRadius: 20,
+              padding: "16px",
+              marginBottom: 14,
+            }}
+          >
             <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 12 }}>
               <Avatar name={post.author} />
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 15, fontWeight: "700", color: "#1F2937", fontFamily: "'Noto Sans KR', sans-serif" }}>{post.author}</span>
-                  {post.grade && <span style={{ fontSize: 12, color: GRAY, fontFamily: "'Noto Sans KR', sans-serif" }}>{post.grade}</span>}
-                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 20, background: meta.bg, color: meta.text, border: `1px solid ${meta.border}`, fontFamily: "'Noto Sans KR', sans-serif" }}>{post.type}</span>
+                  <span style={{ fontSize: 15, fontWeight: "700", color: "#1F2937", fontFamily: "'Noto Sans KR', sans-serif" }}>
+                    {post.author}
+                  </span>
+                  {post.grade && (
+                    <span style={{ fontSize: 12, color: GRAY, fontFamily: "'Noto Sans KR', sans-serif" }}>
+                      {post.grade}
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontSize: 12,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                      background: meta.bg,
+                      color: meta.text,
+                      border: `1px solid ${meta.border}`,
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
+                  >
+                    {post.type}
+                  </span>
                 </div>
-                <div style={{ fontSize: 12, color: GRAY, marginTop: 2, fontFamily: "'Noto Sans KR', sans-serif" }}>{fmtDate(post.created_at)}</div>
+                <div style={{ fontSize: 12, color: GRAY, marginTop: 2, fontFamily: "'Noto Sans KR', sans-serif" }}>
+                  {fmtDate(post.created_at)}
+                </div>
               </div>
             </div>
 
-            {/* 사진 */}
             {post.image_url && (
               <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 10, background: "#F3F4F6" }}>
-              <img
-  src={post.image_url}
-  alt="기록 사진"
-  onClick={() => {selectedImage && (
-  <div
-    onClick={() => setSelectedImage(null)}
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.85)",
-      zIndex: 9999,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 16,
-    }}
-  >
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setSelectedImage(null);
-      }}
-      style={{
-        position: "absolute",
-        top: 20,
-        right: 20,
-        background: "rgba(255,255,255,0.9)",
-        border: "none",
-        borderRadius: "50%",
-        width: 38,
-        height: 38,
-        fontSize: 22,
-        cursor: "pointer",
-        zIndex: 10000,
-      }}
-    >
-      ×
-    </button>
+                <img
+                  src={post.image_url}
+                  alt="기록 사진"
+                  onClick={() => setSelectedImage(post.image_url)}
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    maxHeight: 280,
+                    objectFit: "cover",
+                    cursor: "zoom-in",
+                  }}
+                />
+              </div>
+            )}
 
-    <img
-      src={selectedImage}
-      alt="확대 사진"
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        maxWidth: "100%",
-        maxHeight: "90vh",
-        objectFit: "contain",
-        borderRadius: 12,
-      }}
-    />
-  </div>
-)}
-  
-            {/* 이모지 (사진 없을 때) */}
             {!post.image_url && (
-              <div style={{ background: IVORY, borderRadius: 12, padding: "10px", marginBottom: 10, textAlign: "center", fontSize: 44 }}>
+              <div
+                style={{
+                  background: IVORY,
+                  borderRadius: 12,
+                  padding: "10px",
+                  marginBottom: 10,
+                  textAlign: "center",
+                  fontSize: 44,
+                }}
+              >
                 {post.emoji || meta.emoji}
               </div>
             )}
 
-            {/* 내용 */}
-            <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.75, margin: "0 0 12px", fontFamily: "'Noto Sans KR', sans-serif" }}>{post.content}</p>
-
-            {/* 액션 */}
-            <div style={{ display: "flex", gap: 14, borderTop: "1px solid #F3E8D4", paddingTop: 10, marginBottom: isExpanded ? 12 : 0 }}>
-              <button onClick={() => handleLike(post.id)} style={{
-                background: "none", border: "none", cursor: "pointer",
-                display: "flex", alignItems: "center", gap: 5,
-                fontSize: 13, color: post._liked ? ORANGE : GRAY,
+            <p
+              style={{
+                fontSize: 14,
+                color: "#374151",
+                lineHeight: 1.75,
+                margin: "0 0 12px",
                 fontFamily: "'Noto Sans KR', sans-serif",
-                transition: "transform 0.15s",
-              }}>
+              }}
+            >
+              {post.content}
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: 14,
+                borderTop: "1px solid #F3E8D4",
+                paddingTop: 10,
+                marginBottom: isExpanded ? 12 : 0,
+              }}
+            >
+              <button
+                onClick={() => handleLike(post.id)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  fontSize: 13,
+                  color: post._liked ? ORANGE : GRAY,
+                  fontFamily: "'Noto Sans KR', sans-serif",
+                }}
+              >
                 <span style={{ fontSize: 16 }}>{post._liked ? "❤️" : "🤍"}</span> {post._likes}
               </button>
-              <button onClick={() => setExpanded(prev => ({ ...prev, [post.id]: !prev[post.id] }))} style={{
-                background: "none", border: "none", cursor: "pointer",
-                display: "flex", alignItems: "center", gap: 5,
-                fontSize: 13, color: isExpanded ? ORANGE : GRAY,
-                fontFamily: "'Noto Sans KR', sans-serif",
-              }}>
+
+              <button
+                onClick={() => setExpanded(prev => ({ ...prev, [post.id]: !prev[post.id] }))}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  fontSize: 13,
+                  color: isExpanded ? ORANGE : GRAY,
+                  fontFamily: "'Noto Sans KR', sans-serif",
+                }}
+              >
                 <span style={{ fontSize: 16 }}>💬</span> {post._comments.length}개
               </button>
             </div>
 
-            {/* 댓글 영역 */}
             {isExpanded && (
               <div>
                 {post._comments.map((c, i) => (
                   <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
                     <Avatar name={c.author} size={26} />
                     <div style={{ background: "#F9F5F0", borderRadius: 10, padding: "7px 11px", flex: 1 }}>
-                      <span style={{ fontSize: 12, fontWeight: "700", color: "#1F2937", fontFamily: "'Noto Sans KR', sans-serif" }}>{c.author} </span>
-                      <span style={{ fontSize: 13, color: "#374151", fontFamily: "'Noto Sans KR', sans-serif" }}>{c.text}</span>
+                      <span style={{ fontSize: 12, fontWeight: "700", color: "#1F2937", fontFamily: "'Noto Sans KR', sans-serif" }}>
+                        {c.author}{" "}
+                      </span>
+                      <span style={{ fontSize: 13, color: "#374151", fontFamily: "'Noto Sans KR', sans-serif" }}>
+                        {c.text}
+                      </span>
                     </div>
                   </div>
                 ))}
 
-                {/* 댓글 작성 */}
                 <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
                   <input
                     value={commentAuthor[post.id] || ""}
                     onChange={e => setCommentAuthor(prev => ({ ...prev, [post.id]: e.target.value }))}
                     placeholder="이름 (선택)"
-                    style={{ border: "1px solid #F3E8D4", borderRadius: 10, padding: "7px 12px", fontSize: 13, outline: "none", background: "#FAFAF8", fontFamily: "'Noto Sans KR', sans-serif" }}
+                    style={{
+                      border: "1px solid #F3E8D4",
+                      borderRadius: 10,
+                      padding: "7px 12px",
+                      fontSize: 13,
+                      outline: "none",
+                      background: "#FAFAF8",
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
                   />
+
                   <div style={{ display: "flex", gap: 6 }}>
                     <input
                       value={commentText[post.id] || ""}
                       onChange={e => setCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
                       onKeyDown={e => e.key === "Enter" && handleComment(post.id)}
                       placeholder="응원 댓글을 남겨요 💬"
-                      style={{ flex: 1, border: "1px solid #F3E8D4", borderRadius: 20, padding: "8px 14px", fontSize: 13, outline: "none", background: "#FAFAF8", fontFamily: "'Noto Sans KR', sans-serif" }}
+                      style={{
+                        flex: 1,
+                        border: "1px solid #F3E8D4",
+                        borderRadius: 20,
+                        padding: "8px 14px",
+                        fontSize: 13,
+                        outline: "none",
+                        background: "#FAFAF8",
+                        fontFamily: "'Noto Sans KR', sans-serif",
+                      }}
                     />
-                    <button onClick={() => handleComment(post.id)} disabled={submittingComment[post.id]} style={{
-                      background: ORANGE, color: "#fff", border: "none", borderRadius: 20,
-                      padding: "8px 14px", cursor: "pointer", fontSize: 13, fontWeight: "700",
-                      fontFamily: "'Noto Sans KR', sans-serif",
-                      opacity: submittingComment[post.id] ? 0.6 : 1,
-                    }}>등록</button>
+
+                    <button
+                      onClick={() => handleComment(post.id)}
+                      disabled={submittingComment[post.id]}
+                      style={{
+                        background: ORANGE,
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 20,
+                        padding: "8px 14px",
+                        cursor: "pointer",
+                        fontSize: 13,
+                        fontWeight: "700",
+                        fontFamily: "'Noto Sans KR', sans-serif",
+                        opacity: submittingComment[post.id] ? 0.6 : 1,
+                      }}
+                    >
+                      등록
+                    </button>
                   </div>
                 </div>
               </div>
@@ -663,7 +803,6 @@ function FeedScreen({ setScreen, db }) {
     </div>
   );
 }
-
 // ──────────────────────────────────────────────
 // 기록 업로드 (사진 포함)
 // ──────────────────────────────────────────────
