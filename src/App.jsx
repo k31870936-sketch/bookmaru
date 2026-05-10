@@ -110,14 +110,19 @@ const TYPE_META = {
 };
 
 const fmtDate = (iso) => {
+  if (!iso) return "";
+
   const d = new Date(iso);
-  const now = new Date();
-  const diff = Math.floor((now - d) / 60000);
-  if (diff < 1) return "방금 전";
-  if (diff < 60) return `${diff}분 전`;
-  if (diff < 1440) return `${Math.floor(diff / 60)}시간 전`;
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(d);
 };
+
 
 const avatarColor = (name) => {
   const palette = ["#FB923C", "#34D399", "#60A5FA", "#F472B6", "#A78BFA", "#FBBF24"];
@@ -638,7 +643,15 @@ function FeedScreen({ setScreen, db }) {
             </div>
 
             {post.image_url && (
-              <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 10, background: "#F3F4F6" }}>
+              <div
+                style={{
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  marginBottom: 10,
+                  background: "#F3F4F6",
+                  border: "1px solid #F3E8D4",
+                }}
+              >
                 <img
                   src={post.image_url}
                   alt="기록 사진"
@@ -651,6 +664,19 @@ function FeedScreen({ setScreen, db }) {
                     cursor: "zoom-in",
                   }}
                 />
+
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    background: "#FFF7ED",
+                    color: "#92400E",
+                    fontSize: 12,
+                    fontFamily: "'Noto Sans KR', sans-serif",
+                    borderTop: "1px solid #F3E8D4",
+                  }}
+                >
+                  📅 {fmtDate(post.created_at)}
+                </div>
               </div>
             )}
 
