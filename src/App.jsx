@@ -863,7 +863,7 @@ function UploadScreen({ setScreen, db, onPostAdded }) {
       author: form.author,
       grade: form.grade || null,
       type: form.type,
-      content: form.content,
+      content: `[${new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date())}] ${form.content}`,
       image_url: imageUrl,
       emoji: TYPE_META[form.type]?.emoji || "📝",
     });
