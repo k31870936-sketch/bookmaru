@@ -586,24 +586,7 @@ function FeedScreen({ setScreen, db }) {
     />
   </div>
 )}
-    {/* 사진 */}
-{post.image_url && (
-  <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 10, background: "#F3F4F6" }}>
-    <img
-      src={post.image_url}
-      alt="기록 사진"
-      onClick={() => setSelectedImage(post.image_url)}
-      style={{
-        width: "100%",
-        display: "block",
-        maxHeight: 280,
-        objectFit: "cover",
-        cursor: "zoom-in",
-      }}
-    />
-  </div>
-)}
-
+  
             {/* 이모지 (사진 없을 때) */}
             {!post.image_url && (
               <div style={{ background: IVORY, borderRadius: 12, padding: "10px", marginBottom: 10, textAlign: "center", fontSize: 44 }}>
