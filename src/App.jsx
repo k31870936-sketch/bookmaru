@@ -537,17 +537,55 @@ function FeedScreen({ setScreen, db }) {
               <img
   src={post.image_url}
   alt="기록 사진"
-  onClick={() => setSelectedImage(post.image_url)}
-  style={{
-    width: "100%",
-    display: "block",
-    maxHeight: 280,
-    objectFit: "cover",
-    cursor: "zoom-in",
-  }}
-/>
-              </div>
-            )}
+  onClick={() => {selectedImage && (
+  <div
+    onClick={() => setSelectedImage(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.85)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16,
+    }}
+  >
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedImage(null);
+      }}
+      style={{
+        position: "absolute",
+        top: 20,
+        right: 20,
+        background: "rgba(255,255,255,0.9)",
+        border: "none",
+        borderRadius: "50%",
+        width: 38,
+        height: 38,
+        fontSize: 22,
+        cursor: "pointer",
+        zIndex: 10000,
+      }}
+    >
+      ×
+    </button>
+
+    <img
+      src={selectedImage}
+      alt="확대 사진"
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        maxWidth: "100%",
+        maxHeight: "90vh",
+        objectFit: "contain",
+        borderRadius: 12,
+      }}
+    />
+  </div>
+)}
 
             {/* 이모지 (사진 없을 때) */}
             {!post.image_url && (
