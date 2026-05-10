@@ -432,7 +432,7 @@ function NoticeDetailScreen({ notice, setScreen }) {
 // ──────────────────────────────────────────────
 // 성장기록 피드
 // ──────────────────────────────────────────────
-function FeedScreen({ setScreen, db }) {
+function FeedScreen({ setScreen, db, isTeacher }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("전체");
@@ -1230,7 +1230,7 @@ export default function App() {
         {screen === "home" && <HomeScreen setScreen={setScreen} notices={notices} posts={posts} />}
         {screen === "notices" && <NoticesScreen setScreen={setScreen} notices={notices} setDetailNotice={setDetailNotice} />}
         {screen === "noticeDetail" && <NoticeDetailScreen notice={detailNotice} setScreen={setScreen} />}
-        {screen === "feed" {screen === "feed" && <FeedScreen setScreen={setScreen} db={db} />}{screen === "feed" && <FeedScreen setScreen={setScreen} db={db} />} <FeedScreen setScreen={setScreen} db={db} isTeacher={isTeacher} />}
+        {screen === "feed" && <FeedScreen setScreen={setScreen} db={db} isTeacher={isTeacher} />}
         {screen === "upload" && (
           <UploadScreen
             setScreen={setScreen} db={db}
@@ -1253,3 +1253,4 @@ export default function App() {
     </div>
   );
 }
+깃허브 코드에 날짜와 시간 추가 방법 - Manus
