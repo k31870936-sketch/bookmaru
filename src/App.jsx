@@ -431,6 +431,7 @@ function FeedScreen({ setScreen, db }) {
   const [commentAuthor, setCommentAuthor] = useState({});
   const [submittingComment, setSubmittingComment] = useState({});
   const [toast, setToast] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     db.fetchPosts().then(data => { setPosts(data); setLoading(false); });
@@ -465,6 +466,32 @@ function FeedScreen({ setScreen, db }) {
 
   return (
     <div style={{ padding: "20px 16px 24px" }}>
+      {selectedImage && (
+  <div
+    onClick={() => setSelectedImage(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.85)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16,
+    }}
+  >
+    <img
+      src={selectedImage}
+      alt="확대 사진"
+      style={{
+        maxWidth: "100%",
+        maxHeight: "90vh",
+        objectFit: "contain",
+        borderRadius: 12,
+      }}
+    />
+  </div>
+)}
       {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <h1 style={{ fontSize: 20, fontWeight: "800", color: BROWN, margin: 0, fontFamily: "'Noto Sans KR', sans-serif" }}>🌱 성장기록</h1>
@@ -507,7 +534,18 @@ function FeedScreen({ setScreen, db }) {
             {/* 사진 */}
             {post.image_url && (
               <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 10, background: "#F3F4F6" }}>
-                <img src={post.image_url} alt="기록 사진" style={{ width: "100%", display: "block", maxHeight: 280, objectFit: "cover" }} />
+              <img
+  src={post.image_url}
+  alt="기록 사진"
+  onClick={() => setSelectedImage(post.image_url)}
+  style={{
+    width: "100%",
+    display: "block",
+    maxHeight: 280,
+    objectFit: "cover",
+    cursor: "zoom-in",
+  }}
+/>
               </div>
             )}
 
